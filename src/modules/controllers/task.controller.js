@@ -19,13 +19,15 @@ module.exports.createNewTask = (req, res) => {
 };
 
 module.exports.changeTaskInfo = (req, res) => {
-  const body = req.body;
-  const _id = body._id;
+  const {body, body: _id} = req;
+  const {Expenses, Date, text} = req.body
+  if((_id && Expenses) || (_id && Date) ||(_id && text)) {
   Task.updateOne({ _id: _id }, body).then(() => {
     Task.find().then((result) => {
       res.send({ data: result });
-    });
-  });
+    })
+  }).catch((err) => res.status(500).send("error in getting a task by id"));
+};
 };
 
 module.exports.deleteTask = (req, res) => {
@@ -33,13 +35,7 @@ module.exports.deleteTask = (req, res) => {
     Task.deleteOne({ _id: req.query.id }).then(() => {
       Task.find().then((result) => {
         res.send({ data: result });
-      });
-    });
+      }).catch((err) => res.status(500).send("404 tasks not created"));
+    }).catch((err) => res.status(500).send("404 tasks not created"));
   } 
-};
-
-module.exports.deleteAll = (req, res) => {
-  Task.deleteMany({}).then(() => {
-    res.send({});
-  });
 };
